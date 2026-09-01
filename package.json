@@ -89,11 +89,6 @@
         },
         {
           "type": "bitmap",
-          "name": "notification_indicator",
-          "file": "notification-indicator.png"
-        },
-        {
-          "type": "bitmap",
           "name": "bluetooth_connected",
           "file": "bluetooth-connected.png"
         },

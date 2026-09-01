@@ -104,7 +104,7 @@ function drawBatteryLevel() {
 }
 
 // Check if the watch is connected via bluetooth
-const bluetoothConnected = new Poco.PebbleBitmap(12);
+const bluetoothConnected = new Poco.PebbleBitmap(11);
 let isConnected = true;
 
 function checkConnection() {
@@ -200,14 +200,14 @@ async function fetchWeather(latitude, longitude) {
 }
 
 // Load the weather icons
-const sunny = new Poco.PebbleBitmap(13);
-const cloudy = new Poco.PebbleBitmap(14);
-const rainy = new Poco.PebbleBitmap(15);
-const snowy = new Poco.PebbleBitmap(16);
-const stormy = new Poco.PebbleBitmap(17);
+const sunny = new Poco.PebbleBitmap(12);
+const cloudy = new Poco.PebbleBitmap(13);
+const rainy = new Poco.PebbleBitmap(14);
+const snowy = new Poco.PebbleBitmap(15);
+const stormy = new Poco.PebbleBitmap(16);
 
-const thermometer = new Poco.PebbleBitmap(18);
-const humidity = new Poco.PebbleBitmap(19);
+const thermometer = new Poco.PebbleBitmap(17);
+const humidity = new Poco.PebbleBitmap(18);
 
 // Initialize placeholders for steps, distance walked, and heartrate
 let steps = -1;
@@ -289,9 +289,9 @@ function sendLocationRequest(latitude, longitude, attempt) {
 }
 
 // Load the health icons
-const heartRateIcon = new Poco.PebbleBitmap(20);
-const stepsIcon = new Poco.PebbleBitmap(21);
-const distanceIcon = new Poco.PebbleBitmap(22);
+const heartRateIcon = new Poco.PebbleBitmap(19);
+const stepsIcon = new Poco.PebbleBitmap(20);
+const distanceIcon = new Poco.PebbleBitmap(21);
 
 // Formatting for steps, distance walked, and heartrate
 function formatSteps() {
