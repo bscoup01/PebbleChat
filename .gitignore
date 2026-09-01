@@ -2,4 +2,4 @@
 .lock-waf*
 .git
 build
-node-modules
+node_modules
