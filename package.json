@@ -1,0 +1,153 @@
+{
+  "name": "PebbleChat",
+  "author": "bscoup01",
+  "version": "1.0.0",
+  "keywords": [
+    "pebble-app"
+  ],
+  "private": true,
+  "dependencies": {
+    "@moddable/pebbleproxy": "^0.1.8"
+  },
+  "pebble": {
+    "displayName": "PebbleChat",
+    "uuid": "2fa09435-74af-45f8-b5d6-06e42e1c8126",
+    "projectType": "moddable",
+    "sdkVersion": "3",
+    "enableMultiJS": true,
+    "targetPlatforms": [
+      "emery"
+    ],
+    "watchapp": {
+      "watchface": true
+    },
+    "capabilities": [
+      "location",
+      "health"
+    ],
+    "messageKeys": [
+      "HEALTH_STEPS",
+      "HEART_RATE_BPM",
+      "WALKED_DISTANCE_METERS",
+      "LATITUDE",
+      "LONGITUDE",
+      "WEATHER_TEMP",
+      "WEATHER_CODE",
+      "WEATHER_HUMIDITY"
+    ],
+    "resources": {
+      "media": [
+        {
+          "type": "bitmap",
+          "name": "background",
+          "file": "background.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "now_entering_a",
+          "file": "now-entering/now-entering-a.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "now_entering_b",
+          "file": "now-entering/now-entering-b.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "now_entering_c",
+          "file": "now-entering/now-entering-c.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "now_entering_d",
+          "file": "now-entering/now-entering-d.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "room_a_icon",
+          "file": "room-icons/room-a-icon.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "room_b_icon",
+          "file": "room-icons/room-b-icon.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "room_c_icon",
+          "file": "room-icons/room-c-icon.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "room_d_icon",
+          "file": "room-icons/room-d-icon.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "charging",
+          "file": "charging.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "notification_indicator",
+          "file": "notification-indicator.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "bluetooth_connected",
+          "file": "bluetooth-connected.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "sun",
+          "file": "weather-icons/sun.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "cloud",
+          "file": "weather-icons/cloud.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "umbrella",
+          "file": "weather-icons/umbrella.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "snowman",
+          "file": "weather-icons/snowman.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "lightning",
+          "file": "weather-icons/lightning.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "thermometer",
+          "file": "weather-icons/thermometer.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "humidity",
+          "file": "weather-icons/humidity.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "heartrate",
+          "file": "health-icons/heartrate.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "steps",
+          "file": "health-icons/steps.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "distance",
+          "file": "health-icons/distance.png"
+        }
+      ]
+    }
+  }
+}
