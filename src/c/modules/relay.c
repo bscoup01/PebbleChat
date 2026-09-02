@@ -7,16 +7,11 @@ static AppTimer *s_retry_timer = NULL;
 static AppTimer *s_startup_timer = NULL;
 static void schedule_retry(uint32_t ms);
 
-// Send step count and heartrate to phone
+static int32_t s_last_steps = -1;
+static int32_t s_last_heartrate = -1;
+static int32_t s_last_walk_meters = -1;
+// Send step count, distance walked, and heartrate to phone
 static void send_health_data(void) {
-    DictionaryIterator *iter = NULL;
-    AppMessageResult result = app_message_outbox_begin(&iter);
-    if (result != APP_MSG_OK) {
-        APP_LOG(APP_LOG_LEVEL_WARNING, "Outbox_begin failed: %d (retry)", (int)result);
-        schedule_retry(2000);
-        return;
-    }
-
     int32_t steps = 0;
     if(health_service_sum_today(HealthMetricStepCount) > 0) {
         steps = (int32_t)health_service_sum_today(HealthMetricStepCount);
@@ -32,6 +27,18 @@ static void send_health_data(void) {
         walk_meters = (int32_t)health_service_sum_today(HealthMetricWalkedDistanceMeters);
     }
 
+    // Skip sending health data if nothing has changed
+    if (steps == s_last_steps && heartrate == s_last_heartrate && walk_meters == s_last_walk_meters) {
+        return;
+    }
+    DictionaryIterator *iter = NULL;
+    AppMessageResult result = app_message_outbox_begin(&iter);
+    if (result != APP_MSG_OK) {
+        APP_LOG(APP_LOG_LEVEL_WARNING, "Outbox_begin failed: %d (retry)", (int)result);
+        schedule_retry(2000);
+        return;
+    }
+
     dict_write_int32(iter, MESSAGE_KEY_HEALTH_STEPS, steps);
     dict_write_int32(iter, MESSAGE_KEY_HEART_RATE_BPM, heartrate);
     dict_write_int32(iter, MESSAGE_KEY_WALKED_DISTANCE_METERS, walk_meters);
@@ -43,6 +50,10 @@ static void send_health_data(void) {
         return;
     }
 
+    s_last_steps = steps;
+    s_last_heartrate = heartrate;
+    s_last_walk_meters = walk_meters;
+    
     APP_LOG(APP_LOG_LEVEL_INFO, "Sent steps: %ld, heartrate: %ld, and distance walked: %ld", (long)steps, (long)heartrate, (long)walk_meters);
 }
 
