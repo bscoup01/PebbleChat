@@ -1,3 +1,7 @@
+const Clay = require("@rebble/clay");
+const clayConfig = require("./config");
+const clay = new Clay(clayConfig);
+
 const moddableProxy = require("@moddable/pebbleproxy");
 
 function xhrRequest(url, callback) {
@@ -26,6 +30,7 @@ function xhrRequest(url, callback) {
         errback(String(e));
     }
 }
+
 Pebble.addEventListener("ready", function(_e) {
     console.log("PKJS ready");
 });
@@ -47,7 +52,7 @@ Pebble.addEventListener("appmessage", function(e) {
                 try {
                     const data = JSON.parse(responseText);
                     Pebble.sendAppMessage({
-                        WEATHER_TEMP: Math.round(data.current.temperature_2m * 1.8 + 32),
+                        WEATHER_TEMP: Math.round(data.current.temperature_2m * 10),
                         WEATHER_CODE: data.current.weather_code,
                         WEATHER_HUMIDITY: Math.round(data.current.relative_humidity_2m)
                     }, function() {

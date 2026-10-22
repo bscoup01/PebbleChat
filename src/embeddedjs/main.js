@@ -42,10 +42,33 @@ const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
 
 let lastDate = new Date();
 
+// User settings
+const DEFAULT_SETTINGS = {
+    clock: "12",      // "12" or "24"
+    distance: "mi",   // "mi" or "km"
+    temp: "f"         // "f" or "c"
+};
+
+function loadSettings() {
+    const stored = localStorage.getItem("settings");
+    if (stored) {
+        try {
+            return { ...DEFAULT_SETTINGS, ...JSON.parse(stored) };
+        } catch (e) {
+            console.log("Failed to parse settings");
+        }
+    }
+    return { ...DEFAULT_SETTINGS };
+}
+
+function saveSettings() {
+    localStorage.setItem("settings", JSON.stringify(settings));
+}
+
+let settings = loadSettings();
+
 // Weather data
 let weather = null;
-let latitude = null;
-let longitude = null;
 
 // Track battery percentage
 let batteryPercent = 100;
@@ -66,7 +89,6 @@ if (initialSample) {
     batteryPercent = initialSample.percent;
     isCharging = initialSample.charging;
 }
-
 
 // Load background
 const background = new Poco.PebbleBitmap(1);
@@ -170,35 +192,6 @@ function getWeatherType(code) {
     return 5;
 }
 
-// Fetch the temperature and weather
-async function fetchWeather(latitude, longitude) {
-    try {
-        const url = new URL("http://api.open-meteo.com/v1/forecast");
-        url.search = new URLSearchParams({
-            latitude,
-            longitude,
-            current: "temperature_2m,weather_code,relative_humidity_2m"
-        });
-
-        console.log("Fetching weather...");
-        const response = await fetch(url);
-        const data = await response.json();
-
-        weather = {
-            temp: Math.round(data.current.temperature_2m * 1.8 + 32),
-            conditions: getWeatherDescription(data.current.weather_code),
-            weatherCode: getWeatherType(data.current.weather_code),
-            humidity: data.current.relative_humidity_2m
-        };
-
-        console.log("Weather: " + weather.temp + " F, " + weather.conditions);
-        drawScreen();
-
-    } catch (e) {
-        console.log("Weather fetch error: " + e);
-    }
-}
-
 // Load the weather icons
 const sunny = new Poco.PebbleBitmap(12);
 const cloudy = new Poco.PebbleBitmap(13);
@@ -219,7 +212,7 @@ let pendingLocation = null;
 
 // AppMessage interface to receive data from PKJS
 const message = new Message(
-    {keys: ["HEALTH_STEPS", "HEART_RATE_BPM", "WALKED_DISTANCE_METERS", "LATITUDE", "LONGITUDE", "WEATHER_TEMP", "WEATHER_CODE", "WEATHER_HUMIDITY"],
+    {keys: ["HEALTH_STEPS", "HEART_RATE_BPM", "WALKED_DISTANCE_METERS", "LATITUDE", "LONGITUDE", "WEATHER_TEMP", "WEATHER_CODE", "WEATHER_HUMIDITY", "CLOCK_FORMAT", "DISTANCE_UNIT", "TEMP_UNIT"],
     input: 128,
     output: 128,
 
@@ -257,12 +250,31 @@ const message = new Message(
 
         if (data.has("WEATHER_TEMP") && data.has("WEATHER_CODE") && data.has("WEATHER_HUMIDITY")) {
             weather = {
-                temp: data.get("WEATHER_TEMP"),
+                tempC: data.get("WEATHER_TEMP") / 10,
                 conditions: getWeatherDescription(data.get("WEATHER_CODE")),
                 weatherCode: getWeatherType(data.get("WEATHER_CODE")),
                 humidity: data.get("WEATHER_HUMIDITY")
             };
-            console.log("Weather: " + weather.temp + " F, " + weather.conditions + ", Weather code: " + weather.weatherCode + ", " + weather.humidity + "%");
+            console.log("Weather: " + formatTemp(weather.tempC) + ", " + weather.conditions + ", Weather code: " + weather.weatherCode + ", " + weather.humidity + "%");
+        }
+
+        // Settings from the Clay page (values arrive as strings, but String() also covers numbers)
+        let settingsChanged = false;
+        if (data.has("CLOCK_FORMAT")) {
+            settings.clock = String(data.get("CLOCK_FORMAT")) === "24" ? "24" : "12";
+            settingsChanged = true;
+        }
+        if (data.has("DISTANCE_UNIT")) {
+            settings.distance = String(data.get("DISTANCE_UNIT")) === "km" ? "km" : "mi";
+            settingsChanged = true;
+        }
+        if (data.has("TEMP_UNIT")) {
+            settings.temp = String(data.get("TEMP_UNIT")) === "c" ? "c" : "f";
+            settingsChanged = true;
+        }
+        if (settingsChanged) {
+            saveSettings();
+            console.log(`Settings: clock=${settings.clock} distance=${settings.distance} temp=${settings.temp}`);
         }
         drawScreen();
     }
@@ -301,10 +313,17 @@ function formatSteps() {
 }
 
 function formatDistance() {
-    // Neative means it hasn't been received yet
-    if (distanceWalked < 0) return ": -- mi";
-    const miles = Math.trunc((distanceWalked / 1609.344) * 100) / 100;
-    return `: ${miles} mi`;
+    const unit = settings.distance === "km" ? "km" : "mi";
+    // Negative means it hasn't been received yet
+    if (distanceWalked < 0) return `: -- ${unit}`;
+    const divisor = unit === "km" ? 1000 : 1609.344;
+    const dist = Math.trunc((distanceWalked / divisor) * 100) / 100;
+    return `: ${dist} ${unit}`;
+}
+
+function formatTemp(celsius) {
+    if (settings.temp === "c") return `${Math.round(celsius)} C`;
+    return `${Math.round(celsius * 1.8 + 32)} F`;
 }
 
 function formatHeartRate() {
@@ -383,13 +402,15 @@ function drawScreen(event) {
 
     // Format time as HH:MM
     let hours = now.getHours();
-    if (hours > 11) {
-        render.drawText("PM", standardFont, black, 181, 88);
-    } else {
+    if (settings.clock === "12") {
+        if (hours > 11) {
+            render.drawText("PM", standardFont, black, 181, 88);
+        } else {
             render.drawText("AM", standardFont, black, 181, 88);
+        }
+        if (hours > 12) hours = hours - 12;
+        if (hours == 0) hours = 12;
     }
-    if (hours > 12) hours = hours - 12;
-    if (hours == 0) hours = 12;
     
     const hoursStr = String(hours).padStart(2, "0");
     const minutes = String(now.getMinutes()).padStart(2, "0");
@@ -458,7 +479,7 @@ function drawScreen(event) {
     render.drawBitmap(thermometer, 85, 195);
     render.drawBitmap(humidity, 138, 195);
     if (weather) {
-        const tempStr = `: ${weather.temp} F`;
+        const tempStr = `: ${formatTemp(weather.tempC)}`;
         const weatherStr = `: ${weather.conditions}`;
         const humidityStr = `: ${weather.humidity}%`;
         

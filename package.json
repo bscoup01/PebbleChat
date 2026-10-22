@@ -1,13 +1,14 @@
 {
   "name": "PebbleChat",
   "author": "bscoup01",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "keywords": [
     "pebble-app"
   ],
   "private": true,
   "dependencies": {
-    "@moddable/pebbleproxy": "^0.1.8"
+    "@moddable/pebbleproxy": "^0.1.8",
+    "@rebble/clay": "^1.0.0"
   },
   "pebble": {
     "displayName": "PebbleChat",
@@ -23,7 +24,8 @@
     },
     "capabilities": [
       "location",
-      "health"
+      "health",
+      "configurable"
     ],
     "messageKeys": [
       "HEALTH_STEPS",
@@ -33,7 +35,10 @@
       "LONGITUDE",
       "WEATHER_TEMP",
       "WEATHER_CODE",
-      "WEATHER_HUMIDITY"
+      "WEATHER_HUMIDITY",
+      "CLOCK_FORMAT",
+      "DISTANCE_UNIT",
+      "TEMP_UNIT"
     ],
     "resources": {
       "media": [
